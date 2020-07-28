@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.imooc.oa.dao.EmployeeDao">
+
+    <resultMap id="employee" type="Employee">
+        <id property="sn" column="sn" javaType="String"/>
+        <id property="password" column="password" javaType="String"/>
+        <id property="name" column="name" javaType="String"/>
+        <id property="departmentSn" column="department_sn" javaType="String"/>
+        <id property="post" column="post" javaType="String"/>
+        <association property="department" column="department_sn" javaType="Department">
+            <id property="sn" column="dsn" javaType="String"/>
+            <id property="name" column="dname" javaType="String"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert">
+        insert into employee values(#{sn},#{password},#{name},#{departmentSn},#{post})
+    </insert>
+
+    <update id="update">
+        update employee set password=#{password},name=#{name},department_sn=#{departmentSn},post=#{post} where sn=#{sn}
+    </update>
+
+    <delete id="delete">
+        delete from employee where sn=#{sn}
+    </delete>
+
+    <select id="select" resultMap="employee">
+        select e.*,d.sn dsn,d.name dname from employee e,department d
+        where e.department_sn=d.sn and e.sn=#{sn}
+    </select>
+
+    <select id="selectAll" resultMap="employee">
+        select e.*,d.sn dsn,d.name dname from employee e left join department d
+        on e.department_sn=d.sn
+    </select>
+
+    <select id="selectByDepartAndPost" resultMap="employee">
+        select e.*,d.sn dsn,d.name dname from employee e left join department d
+        on e.department_sn=d.sn
+        <where>
+            <if test="dsn!=null">
+                and e.department_sn=#{dsn}
+            </if>
+            <if test="post!=null">
+                and e.post=#{post}
+            </if>
+        </where>
+    </select>
+
+</mapper>
